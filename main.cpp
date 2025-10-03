@@ -16,6 +16,7 @@
 #include <QRegularExpression>
 #include <vector>
 
+
 #include "include/calc.h"
 #include "include/header.h"
 
@@ -161,12 +162,40 @@ int main(int argc, char *argv[]) {
     window.setLayout(mainLayout);
     window.show();
 
-    QObject::connect(btn,&QPushButton::clicked,[&](){
-        QString ciudad = inputCiudad->text();
-        int dia = inputDia->text().toInt();
-        label->setText(depure(ciudad,dia));
-        mapWidget->update(); // redibuja mapa
-    });
+    QObject::connect(btn, &QPushButton::clicked, [&]() {
+    QString ciudad = inputCiudad->text();
+    int dia = inputDia->text().toInt();
+
+    QString tempStr = depure(ciudad, dia); // depure devuelve un QString tipo "Día 45: 25°C"
+
+    // Regex moderno para capturar el último número en el string
+    QRegularExpression re("(-?\\d+(\\.\\d+)?)(?!.*\\d)");
+    QRegularExpressionMatch match = re.match(tempStr);
+
+    double tempC = 0;
+    if(match.hasMatch()) {
+        tempC = match.captured(1).toDouble();
+    } else {
+        label->setText("Error: no se pudo leer la temperatura");
+        return;
+    }
+
+    double tempK = to_kelvin(tempC);
+
+    label->setText(
+        QString("Temperatura en %1 el día %2:\nCelsius: %3 °C\nKelvin: %4 K")
+            .arg(ciudad)
+            .arg(dia)
+            .arg(tempC)
+            .arg(tempK)
+    );
+
+    mapWidget->update(); // redibuja mapa
+});
+
+
+
+
 
     return app.exec();
 }
