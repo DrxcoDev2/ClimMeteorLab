@@ -139,12 +139,18 @@ int main(int argc, char *argv[]) {
 
     QGridLayout *gridLayout = new QGridLayout();
     gridLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    gridLayout->addWidget(inputLabelCiudad,0,0);
-    gridLayout->addWidget(inputCiudad,0,1);
-    gridLayout->addWidget(inputLabelDia,1,0);
-    gridLayout->addWidget(inputDia,1,1);
-    gridLayout->addWidget(btn,2,0);
-    gridLayout->addWidget(label,2,1);
+
+    gridLayout->setVerticalSpacing(15);
+
+    gridLayout->addWidget(inputLabelCiudad, 0, 0);
+    gridLayout->addWidget(inputCiudad, 0, 2);
+
+    gridLayout->addWidget(inputLabelDia, 2, 0);
+    gridLayout->addWidget(inputDia, 2, 2);
+
+    gridLayout->addWidget(btn, 4, 0);
+    gridLayout->addWidget(label, 4, 2);
+
 
     QWidget *header = crearHeader("Temperatura por Ciudad", &window);
 
