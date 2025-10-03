@@ -43,13 +43,14 @@ protected:
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         // Ajustar al bounding box aproximado de España
-        glOrtho(-10, 5, 35, 45, -1, 1);
+        glOrtho(-20, 20, 30, 50, -1, 1);
+
         glMatrixMode(GL_MODELVIEW);
     }
 
     void paintGL() override {
         glClear(GL_COLOR_BUFFER_BIT);
-        glColor3f(0,0,0);
+        glColor3f(0.0f, 0.39f, 0.0f); 
 
         for(auto &poly : polygons) {
             glBegin(GL_LINE_LOOP);
@@ -146,6 +147,8 @@ int main(int argc, char *argv[]) {
 
     QWidget *header = crearHeader("Temperatura por Ciudad", &window);
 
+
+    // Mapa
     MapWidget *mapWidget = new MapWidget();
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
