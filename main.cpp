@@ -121,87 +121,90 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     QFile file("resources/styles.scss");
-    if(file.open(QFile::ReadOnly)) {
+    if (file.open(QFile::ReadOnly)) {
         QString style = QLatin1String(file.readAll());
         app.setStyleSheet(style);
     }
 
     QWidget window;
-    window.resize(800,600);
+    window.resize(800, 600);
 
+    // Entradas
     QLabel *inputLabelCiudad = new QLabel("Ciudad:");
     QLineEdit *inputCiudad = new QLineEdit();
     QLabel *inputLabelDia = new QLabel("Día (0-365):");
     QLineEdit *inputDia = new QLineEdit();
-    QPushButton *btn = new QPushButton("Mostrar temperatura");
+    QPushButton *btn = new QPushButton("Mostrar resultados");
     QLabel *label = new QLabel("Esperando...");
     label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
+    // Grid súper compacto
     QGridLayout *gridLayout = new QGridLayout();
     gridLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-
-    gridLayout->setVerticalSpacing(15);
+    gridLayout->setContentsMargins(2, 2, 2, 2); // margen externo de 2px
+    gridLayout->setHorizontalSpacing(2);        // separación horizontal
+    gridLayout->setVerticalSpacing(2);          // separación vertical
 
     gridLayout->addWidget(inputLabelCiudad, 0, 0);
-    gridLayout->addWidget(inputCiudad, 0, 2);
+    gridLayout->addWidget(inputCiudad, 0, 1);
 
-    gridLayout->addWidget(inputLabelDia, 2, 0);
-    gridLayout->addWidget(inputDia, 2, 2);
+    gridLayout->addWidget(inputLabelDia, 1, 0);
+    gridLayout->addWidget(inputDia, 1, 1);
 
-    gridLayout->addWidget(btn, 4, 0);
-    gridLayout->addWidget(label, 4, 2);
+    gridLayout->addWidget(btn, 2, 0);
+    gridLayout->addWidget(label, 2, 1);
 
-
+    // Header
     QWidget *header = crearHeader("Temperatura por Ciudad", &window);
-
 
     // Mapa
     MapWidget *mapWidget = new MapWidget();
 
+    // Layout principal compacto
     QVBoxLayout *mainLayout = new QVBoxLayout();
-    mainLayout->setContentsMargins(0,0,0,0);
-    mainLayout->setSpacing(0);
-    mainLayout->addWidget(header);
+    mainLayout->setContentsMargins(2, 2, 2, 2); // margen externo de la ventana
+    mainLayout->setSpacing(2);                  // separación mínima entre header, grid y mapa
+    mainLayout->addWidget(header, 0, Qt::AlignTop);
     mainLayout->addLayout(gridLayout);
-    mainLayout->addWidget(mapWidget);
+    mainLayout->addWidget(mapWidget, 1);
 
     window.setLayout(mainLayout);
     window.show();
 
+    // Conexión del botón
     QObject::connect(btn, &QPushButton::clicked, [&]() {
-    QString ciudad = inputCiudad->text();
-    int dia = inputDia->text().toInt();
+        QString ciudad = inputCiudad->text();
+        int dia = inputDia->text().toInt();
 
-    QString tempStr = depure(ciudad, dia); // depure devuelve un QString tipo "Día 45: 25°C"
+        QString tempStr = depure(ciudad, dia);
 
-    // Regex moderno para capturar el último número en el string
-    QRegularExpression re("(-?\\d+(\\.\\d+)?)(?!.*\\d)");
-    QRegularExpressionMatch match = re.match(tempStr);
+        // Regex moderno para capturar el último número en el string
+        QRegularExpression re("(-?\\d+(\\.\\d+)?)(?!.*\\d)");
+        QRegularExpressionMatch match = re.match(tempStr);
 
-    double tempC = 0;
-    if(match.hasMatch()) {
-        tempC = match.captured(1).toDouble();
-    } else {
-        label->setText("Error: no se pudo leer la temperatura");
-        return;
-    }
+        double tempC = 0;
+        if (match.hasMatch()) {
+            tempC = match.captured(1).toDouble();
+        } else {
+            label->setText("Error: no se pudo leer la temperatura");
+            return;
+        }
 
-    double tempK = to_kelvin(tempC);
+        double tempK = to_kelvin(tempC);
 
-    label->setText(
-        QString("Temperatura en %1 el día %2:\nCelsius: %3 °C\nKelvin: %4 K")
-            .arg(ciudad)
-            .arg(dia)
-            .arg(tempC)
-            .arg(tempK)
-    );
+        label->setText(
+            QString("Temperatura en %1 el día %2:\nCelsius: %3 °C\nKelvin: %4 K|\nPresión: %5 hPa")
+                .arg(ciudad)
+                .arg(dia)
+                .arg(tempC)
+                .arg(tempK)
+                .arg(pressure_ISA(100, tempC) / 100.0)
+        );
 
-    mapWidget->update(); // redibuja mapa
-});
-
-
-
-
+        mapWidget->update();
+    });
 
     return app.exec();
 }
+
+
