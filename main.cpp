@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
     gridLayout->addWidget(label, 2, 1);
 
     // Header
-    QWidget *header = crearHeader("Temperatura por Ciudad", &window);
+    QWidget *header = crearHeader("ClimMeteorLab 2025 - 1.0.0", &window);
 
     // Mapa
     MapWidget *mapWidget = new MapWidget();
@@ -192,13 +192,17 @@ int main(int argc, char *argv[]) {
 
         double tempK = to_kelvin(tempC);
 
+        int Td = 25;
+
         label->setText(
-            QString("Temperatura en %1 el día %2:\nCelsius: %3 °C\nKelvin: %4 K|\nPresión: %5 hPa")
+            QString("Temperatura en %1 el día %2:\nCelsius: %3 °C\nKelvin: %4 K|\nPresión: %5 hPa|\nHR: %6 %")
                 .arg(ciudad)
                 .arg(dia)
                 .arg(tempC)
                 .arg(tempK)
                 .arg(pressure_ISA(100, tempC) / 100.0)
+                .arg(relative_humidity(vapor_pressure_from_dewpoint(Td), tempC))
+
         );
 
         mapWidget->update();

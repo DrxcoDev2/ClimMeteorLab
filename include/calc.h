@@ -72,5 +72,27 @@ double pressure_ISA(double h_m, double T0_C, double P0 = 101325.0, double rh = 0
     return P11 * std::exp(-g0 * delta_h / (R * T_iso));
 }
 
+double saturation_vapor_pressure(double T) {
+    // T en °C
+    return 6.112 * std::exp((17.62 * T) / (T + 243.12));
+}
+
+// Presión parcial del vapor a partir de T (°C) y HR (%)
+double vapor_pressure_from_RH(double T, double RH) {
+    return (RH / 100.0) * saturation_vapor_pressure(T);
+}
+
+// Presión parcial del vapor a partir del punto de rocío Td (°C)
+double vapor_pressure_from_dewpoint(double Td) {
+    return saturation_vapor_pressure(Td);
+}
+
+// Humedad relativa a partir de presión parcial P (hPa) y T (°C)
+double relative_humidity(double P, double T) {
+    double es = saturation_vapor_pressure(T);
+    return (P / es) * 100.0; // HR en %
+}
+
+
 
 #endif // CALC_H
