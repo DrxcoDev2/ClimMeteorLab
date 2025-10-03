@@ -51,7 +51,7 @@ for obj in topo['objects'].values():
                         polygons.append(poly)
 
 # Imprime puntos para C++
-with open('data/polygons.txt', 'w') as file:
+with open('resources/polygons.txt', 'w') as file:
     for poly in polygons:
         for lon, lat in poly:
             file.write(f'    {{{lon:.6f}, {lat:.6f}}},\n')

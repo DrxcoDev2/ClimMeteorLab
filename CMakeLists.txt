@@ -25,8 +25,8 @@ target_include_directories(climapp PRIVATE ${GDAL_INCLUDE_DIRS})
 target_link_libraries(climapp PRIVATE ${QT_LIBS} ${GDAL_LIBRARIES})
 
 # Copia de archivos de datos y estilos al build
-file(COPY data/polygons.txt DESTINATION ${CMAKE_BINARY_DIR}/data)
-file(COPY styles.scss DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY resources/polygons.txt DESTINATION ${CMAKE_BINARY_DIR}/resources)
+file(COPY resources/styles.scss DESTINATION ${CMAKE_BINARY_DIR}/resources)
 
 set_target_properties(climapp PROPERTIES
     AUTOMOC ON
