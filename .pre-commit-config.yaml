@@ -1,0 +1,5 @@
+repos:
+  - repo: https://github.com/conventional-changelog/commitlint
+    rev: v17.0.0
+    hooks:
+      - id: commitlint
