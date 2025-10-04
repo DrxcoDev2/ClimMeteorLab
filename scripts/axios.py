@@ -1,4 +1,4 @@
 import os
 
-os.system("g++ climapp/src/axios.cpp -o climapp/build/axios -std=c++17 -O2")
+os.system("g++ src/axios.cpp -o build/axios -std=c++17 -O2 -lcpr -lcurl")
 os.system("climapp/build/axios")

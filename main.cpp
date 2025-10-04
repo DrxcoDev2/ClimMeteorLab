@@ -19,6 +19,7 @@
 
 #include "include/calc.h"
 #include "include/header.h"
+#include "include/axios.h"
 
 #include <ogrsf_frmts.h> // GDAL/OGR
 
@@ -202,6 +203,7 @@ int main(int argc, char *argv[]) {
                 .arg(tempK)
                 .arg(pressure_ISA(100, tempC) / 100.0)
                 .arg(relative_humidity(vapor_pressure_from_dewpoint(Td), tempC))
+                .arg(getWindSpeed(1.822, 2.118))
 
         );
 
