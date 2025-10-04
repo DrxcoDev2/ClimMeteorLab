@@ -21,10 +21,11 @@ Clone the repository
 Windows is unstable
 
 - ```shell
-  cd ClimMeteorLab
-  mkdir -p build
-  cd build
-  cmake ..
-  make
-  ./climapp.exe
+    cd ClimMeteorLab
+    mkdir build
+    cd build
+    cmake .. -G "MinGW Makefiles"
+    cmake --build . --config Release
+    ./climapp.exe
+
   ```
