@@ -14,22 +14,51 @@ else()
 endif()
 
 find_package(GDAL REQUIRED)
+find_package(nlohmann_json REQUIRED)
+find_package(CURL REQUIRED)
 
+# --- Añadir CPR automáticamente ---
+include(FetchContent)
+FetchContent_Declare(
+  cpr
+  GIT_REPOSITORY https://github.com/libcpr/cpr.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(cpr)
+
+# --- Archivos fuente ---
 set(SOURCES
     main.cpp
+    src/axios.cpp
 )
 
 add_executable(climapp ${SOURCES})
 
-target_include_directories(climapp PRIVATE ${GDAL_INCLUDE_DIRS})
-target_link_libraries(climapp PRIVATE ${QT_LIBS} ${GDAL_LIBRARIES})
+# --- Incluir y enlazar librerías ---
+target_include_directories(climapp PRIVATE 
+    ${GDAL_INCLUDE_DIRS}
+    ${CURL_INCLUDE_DIRS}
+)
 
-# Copia de archivos de datos y estilos al build
+target_link_libraries(climapp PRIVATE 
+    ${QT_LIBS} 
+    ${GDAL_LIBRARIES}
+    ${CURL_LIBRARIES}
+    cpr::cpr
+    nlohmann_json::nlohmann_json
+)
+
+# --- Copiar recursos al directorio de compilación ---
 file(COPY resources/polygons.txt DESTINATION ${CMAKE_BINARY_DIR}/resources)
 file(COPY resources/styles.scss DESTINATION ${CMAKE_BINARY_DIR}/resources)
 
+# --- Propiedades Qt ---
 set_target_properties(climapp PROPERTIES
     AUTOMOC ON
     AUTOUIC ON
     AUTORCC ON
+    OUTPUT_NAME "climapp"
 )
+
+# --- Forzar extensión .exe incluso en Linux ---
+set_target_properties(climapp PROPERTIES SUFFIX ".exe")
