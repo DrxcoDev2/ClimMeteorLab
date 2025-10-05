@@ -10,18 +10,34 @@ double getWindSpeed(double latitude, double longitude) {
                     + std::to_string(latitude)
                     + "&lon=" + std::to_string(longitude);
 
-    auto response = cpr::Get(cpr::Url{url});
+    // Añadimos User-Agent obligatorio
+    auto response = cpr::Get(
+        cpr::Url{url},
+        cpr::Header{{"User-Agent", "climapp/1.0 "}}
+    );
 
     if (response.status_code != 200) {
-        std::cerr << "Error: " << response.status_code << std::endl;
-        return -1;
+        std::cerr << "Error: HTTP " << response.status_code << std::endl;
+        return 0;
     }
 
     try {
         auto data = json::parse(response.text);
-        return data["properties"]["timeseries"][0]["data"]["instant"]["details"]["wind_speed"];
-    } catch (...) {
-        std::cerr << "Error al parsear JSON" << std::endl;
-        return -1;
+
+        auto timeseries = data["properties"]["timeseries"];
+        if (!timeseries.empty()) {
+            auto details = timeseries[0]["data"]["instant"]["details"];
+            if (details.contains("wind_speed")) {
+                return details["wind_speed"].get<double>();
+            } else {
+                std::cerr << "Advertencia: 'wind_speed' no disponible en este momento." << std::endl;
+            }
+        } else {
+            std::cerr << "Advertencia: 'timeseries' vacío." << std::endl;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error al parsear JSON: " << e.what() << std::endl;
     }
+
+    return 0;
 }

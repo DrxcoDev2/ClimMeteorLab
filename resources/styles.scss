@@ -1,46 +1,50 @@
 
+
 /* Fondo general de la ventana */
 QWidget {
-    margin: 0px;
     background-color: #c0c0c0; /* gris típico de Win98 */
     font-family: "MS Sans Serif", Arial, sans-serif;
     font-size: 10pt;
+    qproperty-alignment: 'AlignVCenter | AlignLeft';
 }
 
 /* Etiquetas */
 QLabel {
     color: black;
     font-weight: normal;
+    qproperty-alignment: 'AlignLeft';
 }
 
 /* Botones estilo Win98 */
 QPushButton {
     background-color: #c0c0c0;
-    border: 2px outset #ffffff; /* borde en relieve */
+    border: 2px outset #ffffff;  /* borde en relieve */
     padding: 2px 6px;
 }
 
 QPushButton:pressed {
-    border: 2px inset #ffffff; /* efecto presionado */
+    border: 2px inset #ffffff;   /* efecto presionado */
     background-color: #a0a0a0;
 }
 
-/* Cuadros de texto */
+/* Cuadros de texto (QLineEdit) */
 QLineEdit {
-    margin-top: 10px;
-    background: #0055bd;            /* fuerza fondo sólido */
-    border: 2px solid #808080;      /* borde gris */
+    min-width: 60px;             /* ancho mínimo */
+    max-width: 80px;             /* ancho máximo */
+    margin-top: 6px;
+    background-color: #0055bd;   /* azul sólido retro */
+    border: 2px solid #808080;   /* borde gris clásico */
     padding: 2px;
-    color: rgb(24, 206, 0);
-    border-radius: 0px;
-    selection-background-color: #000080;
+    color: rgb(24, 206, 0);      /* texto verde brillante */
+    border-radius: 0;            /* sin esquinas redondeadas */
+    selection-background-color: #000080; /* selección azul oscuro */
     selection-color: white;
+    text-align: left;
 }
+
 QLineEdit:focus {
-    border: 2px solid #000080;      /* borde azul al enfocar */
+    border: 2px solid #000080;   /* borde azul al enfocar */
 }
-
-
 
 /* Label con borde hundido (como las cajas de estado) */
 QLabel[frame="sunken"] {

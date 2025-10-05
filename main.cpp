@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
     // Grid súper compacto
     QGridLayout *gridLayout = new QGridLayout();
     gridLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    gridLayout->setContentsMargins(2, 2, 2, 2); // margen externo de 2px
+    gridLayout->setContentsMargins(0, 0, 0, 0); // margen externo de 2px
     gridLayout->setHorizontalSpacing(2);        // separación horizontal
     gridLayout->setVerticalSpacing(2);          // separación vertical
 
@@ -155,19 +155,32 @@ int main(int argc, char *argv[]) {
     gridLayout->addWidget(btn, 2, 0);
     gridLayout->addWidget(label, 2, 1);
 
+    //Definir algunas clases
+    //inputLabelDia->setObjectName("labelDia");
+    {
+        inputLabelDia->setFixedWidth(80);
+    }
+    
+
+
     // Header
     QWidget *header = crearHeader("ClimMeteorLab 2025 - 1.0.0", &window);
 
     // Mapa
-    MapWidget *mapWidget = new MapWidget();
+    //MapWidget *mapWidget = new MapWidget();
 
     // Layout principal compacto
     QVBoxLayout *mainLayout = new QVBoxLayout();
-    mainLayout->setContentsMargins(2, 2, 2, 2); // margen externo de la ventana
-    mainLayout->setSpacing(2);                  // separación mínima entre header, grid y mapa
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(2);
+    mainLayout->setAlignment(Qt::AlignTop); // Fuerza la UI arriba
+
     mainLayout->addWidget(header, 0, Qt::AlignTop);
     mainLayout->addLayout(gridLayout);
-    mainLayout->addWidget(mapWidget, 1);
+
+    // mainLayout->addWidget(mapWidget, 1);
+
+    mainLayout->addStretch(0); // evita hueco vacío abajo
 
     window.setLayout(mainLayout);
     window.show();
@@ -207,7 +220,7 @@ int main(int argc, char *argv[]) {
 
         );
 
-        mapWidget->update();
+        //mapWidget->update();
     });
 
     return app.exec();
