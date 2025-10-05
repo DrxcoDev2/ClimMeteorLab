@@ -135,6 +135,8 @@ int main(int argc, char *argv[]) {
     QLineEdit *inputCiudad = new QLineEdit();
     QLabel *inputLabelDia = new QLabel("Día (0-365):");
     QLineEdit *inputDia = new QLineEdit();
+    QLabel *inputLabelCoords = new QLabel("Coordenadas:");
+    QLineEdit *inputCoords = new QLineEdit();
     QPushButton *btn = new QPushButton("Mostrar resultados");
     QLabel *label = new QLabel("Esperando...");
     label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
@@ -149,6 +151,9 @@ int main(int argc, char *argv[]) {
     gridLayout->addWidget(inputLabelCiudad, 0, 0);
     gridLayout->addWidget(inputCiudad, 0, 1);
 
+    gridLayout->addWidget(inputLabelCoords, 0, 2);
+    gridLayout->addWidget(inputCoords, 0, 3);
+
     gridLayout->addWidget(inputLabelDia, 1, 0);
     gridLayout->addWidget(inputDia, 1, 1);
 
@@ -157,8 +162,13 @@ int main(int argc, char *argv[]) {
 
     //Definir algunas clases
     //inputLabelDia->setObjectName("labelDia");
+    //TODO: Pasarlo al .scss    
     {
         inputLabelDia->setFixedWidth(80);
+        inputLabelCiudad->setFixedWidth(80);
+        inputLabelCoords->setFixedWidth(80);
+        inputCoords->setFixedWidth(180);
+        label->setFixedWidth(180);
     }
     
 

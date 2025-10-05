@@ -72,26 +72,44 @@ double pressure_ISA(double h_m, double T0_C, double P0 = 101325.0, double rh = 0
     return P11 * std::exp(-g0 * delta_h / (R * T_iso));
 }
 
+// ==========================================
+// PRESIÓN DE VAPOR DE SATURACIÓN (hPa)
+// ==========================================
+// Fórmula de Magnus-Tetens (precisión alta entre -40°C y +50°C)
 double saturation_vapor_pressure(double T) {
-    // T en °C
-    return 6.112 * std::exp((17.62 * T) / (T + 243.12));
+    // T en °C, devuelve eₛ en hPa
+    return 6.112 * std::exp((17.625 * T) / (T + 243.04));
 }
 
-// Presión parcial del vapor a partir de T (°C) y HR (%)
+// ==========================================
+// PRESIÓN PARCIAL DEL VAPOR DESDE T Y HR
+// ==========================================
 double vapor_pressure_from_RH(double T, double RH) {
+    // T en °C, RH en %
+    // Devuelve e en hPa
     return (RH / 100.0) * saturation_vapor_pressure(T);
 }
 
-// Presión parcial del vapor a partir del punto de rocío Td (°C)
+// ==========================================
+// PRESIÓN PARCIAL DEL VAPOR DESDE PUNTO DE ROCÍO
+// ==========================================
 double vapor_pressure_from_dewpoint(double Td) {
+    // Td en °C
+    // Devuelve e en hPa
     return saturation_vapor_pressure(Td);
 }
 
-// Humedad relativa a partir de presión parcial P (hPa) y T (°C)
-double relative_humidity(double P, double T) {
-    double es = saturation_vapor_pressure(T);
-    return (P / es) * 100.0; // HR en %
+// ==========================================
+// HUMEDAD RELATIVA DESDE T Y PUNTO DE ROCÍO
+// ==========================================
+double relative_humidity(double T, double Td) {
+    // T y Td en °C
+    // Devuelve HR en %
+    double e  = saturation_vapor_pressure(Td); // presión real
+    double es = saturation_vapor_pressure(T);  // presión de saturación
+    return (e / es) * 100.0;
 }
+
 
 
 
