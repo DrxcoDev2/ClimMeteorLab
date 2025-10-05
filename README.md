@@ -29,3 +29,12 @@ Windows is unstable
     ./climapp.exe
 
   ```
+
+## Contribute
+Contributions are welcome!
+1. Fork the repository.
+2. Create a branch: `git checkout -b feature/new-feature`.
+3. Submit a pull request.
+
+# Licence
+This project is licensed under the GNUv3 license. See [LICENSE](LICENCE)
