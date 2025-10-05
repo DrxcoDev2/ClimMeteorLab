@@ -106,10 +106,10 @@ QString depure(QString ciudad, int dia) {
     double media = 0;
 
     if (ciudad == "madrid") media = 15.0;
-    else if (ciudad == "barcelona") media = 20.0;
-    else if (ciudad == "valencia") media = 25.0;
-    else if (ciudad == "sevilla") media = 30.0;
-    else if (ciudad == "zaragoza") media = 12.0;
+    else if (ciudad == "barcelona") media = 16.0;
+    else if (ciudad == "valencia") media = 19.0;
+    else if (ciudad == "sevilla") media = 18.0;
+    else if (ciudad == "zaragoza") media = 15.0;
     else return "Ciudad no reconocida.";
 
     if(dia<0 || dia>365) return "Día inválido (0-365).";
@@ -196,14 +196,14 @@ int main(int argc, char *argv[]) {
         int Td = 25;
 
         label->setText(
-            QString("Temperatura en %1 el día %2:\nCelsius: %3 °C\nKelvin: %4 K|\nPresión: %5 hPa|\nHR: %6 %")
+            QString("Temperatura en %1 el día %2:\nCelsius: %3 °C\nKelvin: %4 K|\nPresión: %5 hPa|\nHR: %6 %\nViento: %7 m/s")
                 .arg(ciudad)
                 .arg(dia)
                 .arg(tempC)
                 .arg(tempK)
                 .arg(pressure_ISA(100, tempC) / 100.0)
                 .arg(relative_humidity(vapor_pressure_from_dewpoint(Td), tempC))
-                .arg(getWindSpeed(1.822, 2.118))
+                .arg(getWindSpeed(59, 60))
 
         );
 
