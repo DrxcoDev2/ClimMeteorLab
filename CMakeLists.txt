@@ -4,15 +4,20 @@ project(climapp LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Buscar Qt6 primero, si no usar Qt5
-find_package(Qt6 COMPONENTS Widgets OpenGLWidgets REQUIRED)
-if(NOT Qt6_FOUND)
-    find_package(Qt5 COMPONENTS Widgets OpenGL REQUIRED)
-    set(QT_LIBS Qt5::Widgets Qt5::OpenGL)
+# --- Buscar Qt6 primero, luego Qt5 ---
+find_package(Qt6 COMPONENTS Widgets Charts REQUIRED)
+if(Qt6_FOUND)
+    message(STATUS "✅ Usando Qt6")
+    set(QT_LIBS Qt6::Widgets Qt6::Charts)
+    include_directories(${Qt6Widgets_INCLUDE_DIRS} ${Qt6Charts_INCLUDE_DIRS})
 else()
-    set(QT_LIBS Qt6::Widgets Qt6::OpenGLWidgets)
+    message(STATUS "⚠️ Usando Qt5")
+    find_package(Qt5 COMPONENTS Widgets Charts REQUIRED)
+    set(QT_LIBS Qt5::Widgets Qt5::Charts)
+    include_directories(${Qt5Widgets_INCLUDE_DIRS} ${Qt5Charts_INCLUDE_DIRS})
 endif()
 
+# --- Otras librerías ---
 find_package(GDAL REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(CURL REQUIRED)
@@ -32,14 +37,17 @@ set(SOURCES
     src/axios.cpp
 )
 
+# --- Crear ejecutable ---
 add_executable(climapp ${SOURCES})
 
-# --- Incluir y enlazar librerías ---
+# --- Incluir librerías ---
 target_include_directories(climapp PRIVATE 
     ${GDAL_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
+    ${Qt6Charts_INCLUDE_DIRS} # ✅ asegúrate de incluir QtCharts
 )
 
+# --- Enlazar librerías ---
 target_link_libraries(climapp PRIVATE 
     ${QT_LIBS} 
     ${GDAL_LIBRARIES}
@@ -52,7 +60,7 @@ target_link_libraries(climapp PRIVATE
 file(COPY resources/polygons.txt DESTINATION ${CMAKE_BINARY_DIR}/resources)
 file(COPY resources/styles.scss DESTINATION ${CMAKE_BINARY_DIR}/resources)
 
-# --- Propiedades Qt ---
+# --- Propiedades de Qt ---
 set_target_properties(climapp PROPERTIES
     AUTOMOC ON
     AUTOUIC ON
@@ -60,5 +68,5 @@ set_target_properties(climapp PROPERTIES
     OUTPUT_NAME "climapp"
 )
 
-# --- Forzar extensión .exe incluso en Linux ---
+# --- Forzar extensión .exe incluso en Linux (opcional) ---
 set_target_properties(climapp PROPERTIES SUFFIX ".exe")

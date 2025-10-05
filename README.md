@@ -37,4 +37,4 @@ Contributions are welcome!
 3. Submit a pull request.
 
 # Licence
-This project is licensed under the GNUv3 license. See [LICENSE](LICENCE)
+This project is licensed under the GNUv3 license. See [LICENCE](LICENCE)

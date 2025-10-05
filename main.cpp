@@ -16,16 +16,23 @@
 #include <QRegularExpression>
 #include <vector>
 
+// --- Qt Charts ---
+#include <QtCharts/QChartView>
+#include <QtCharts/QChart>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
+#include <QtCharts/QValueAxis>
 
 #include "include/calc.h"
 #include "include/header.h"
 #include "include/axios.h"
+#include "include/charts.h"
 
 #include <ogrsf_frmts.h> // GDAL/OGR
 
-// Header retro
-
-
+// ==================== MAPA =====================
 class MapWidget : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
     MapWidget(QWidget *parent = nullptr) : QOpenGLWidget(parent) {
@@ -37,28 +44,25 @@ protected:
 
     void initializeGL() override {
         initializeOpenGLFunctions();
-        glClearColor(0.78f, 0.78f, 0.78f, 1.0f); // fondo gris retro
+        glClearColor(0.78f, 0.78f, 0.78f, 1.0f); // gris retro
     }
 
     void resizeGL(int w, int h) override {
         glViewport(0, 0, w, h);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        // Ajustar al bounding box aproximado de España
         glOrtho(-20, 20, 30, 50, -1, 1);
-
         glMatrixMode(GL_MODELVIEW);
     }
 
     void paintGL() override {
         glClear(GL_COLOR_BUFFER_BIT);
-        glColor3f(0.0f, 0.39f, 0.0f); 
+        glColor3f(0.0f, 0.39f, 0.0f);
 
-        for(auto &poly : polygons) {
+        for (auto &poly : polygons) {
             glBegin(GL_LINE_LOOP);
-            for(auto &p : poly) {
+            for (auto &p : poly)
                 glVertex2f(p.first, p.second);
-            }
             glEnd();
         }
     }
@@ -75,17 +79,12 @@ protected:
         while (!in.atEnd()) {
             QString line = in.readLine().trimmed();
 
-            // Detecta inicio de un polígono (opcional según formato)
-            if (line.startsWith("polygons.push_back({")) {
+            if (line.startsWith("polygons.push_back({"))
                 currentPoly.clear();
-            }
-            // Detecta cierre de un polígono
             else if (line.startsWith("});")) {
                 if (!currentPoly.empty())
                     polygons.push_back(currentPoly);
-            }
-            // Extrae puntos
-            else {
+            } else {
                 QRegularExpressionMatch match = pointRegex.match(line);
                 if (match.hasMatch()) {
                     double lon = match.captured(1).toDouble();
@@ -94,15 +93,16 @@ protected:
                 }
             }
         }
-        // Por si el último polígono no terminó con "});"
         if (!currentPoly.empty())
             polygons.push_back(currentPoly);
     }
 };
 
-// Depure recibe ciudad y día y devuelve la temperatura simulada
+
+
+// ==================== DEPURE =====================
 QString depure(QString ciudad, int dia) {
-    ciudad = ciudad.toLower();  
+    ciudad = ciudad.toLower();
     double media = 0;
 
     if (ciudad == "madrid") media = 15.0;
@@ -112,25 +112,23 @@ QString depure(QString ciudad, int dia) {
     else if (ciudad == "zaragoza") media = 15.0;
     else return "Ciudad no reconocida.";
 
-    if(dia<0 || dia>365) return "Día inválido (0-365).";
+    if (dia < 0 || dia > 365) return "Día inválido (0-365).";
 
-    double temp = temperature(media,5.0,365,0,dia);
-    return "Día "+QString::number(dia)+" - "+ciudad+": "+QString::number(temp,'f',2)+" °C";
+    double temp = temperature(media, 5.0, 365, 0, dia);
+    return "Día " + QString::number(dia) + " - " + ciudad + ": " + QString::number(temp, 'f', 2) + " °C";
 }
 
+// ==================== MAIN =====================
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     QFile file("resources/styles.scss");
-    if (file.open(QFile::ReadOnly)) {
-        QString style = QLatin1String(file.readAll());
-        app.setStyleSheet(style);
-    }
+    if (file.open(QFile::ReadOnly))
+        app.setStyleSheet(QLatin1String(file.readAll()));
 
     QWidget window;
     window.resize(800, 600);
 
-    // Entradas
     QLabel *inputLabelCiudad = new QLabel("Ciudad:");
     QLineEdit *inputCiudad = new QLineEdit();
     QLabel *inputLabelDia = new QLabel("Día (0-365):");
@@ -141,81 +139,58 @@ int main(int argc, char *argv[]) {
     QLabel *label = new QLabel("Esperando...");
     label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
-    // Grid súper compacto
     QGridLayout *gridLayout = new QGridLayout();
     gridLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    gridLayout->setContentsMargins(0, 0, 0, 0); // margen externo de 2px
-    gridLayout->setHorizontalSpacing(2);        // separación horizontal
-    gridLayout->setVerticalSpacing(2);          // separación vertical
+    gridLayout->setContentsMargins(0, 0, 0, 0);
+    gridLayout->setHorizontalSpacing(2);
+    gridLayout->setVerticalSpacing(2);
 
     gridLayout->addWidget(inputLabelCiudad, 0, 0);
     gridLayout->addWidget(inputCiudad, 0, 1);
-
     gridLayout->addWidget(inputLabelCoords, 0, 2);
     gridLayout->addWidget(inputCoords, 0, 3);
-
     gridLayout->addWidget(inputLabelDia, 1, 0);
     gridLayout->addWidget(inputDia, 1, 1);
-
     gridLayout->addWidget(btn, 2, 0);
     gridLayout->addWidget(label, 2, 1);
 
-    //Definir algunas clases
-    //inputLabelDia->setObjectName("labelDia");
-    //TODO: Pasarlo al .scss    
-    {
-        inputLabelDia->setFixedWidth(80);
-        inputLabelCiudad->setFixedWidth(80);
-        inputLabelCoords->setFixedWidth(80);
-        inputCoords->setFixedWidth(180);
-        label->setFixedWidth(180);
-    }
-    
+    inputLabelDia->setFixedWidth(80);
+    inputLabelCiudad->setFixedWidth(80);
+    inputLabelCoords->setFixedWidth(80);
+    inputCoords->setFixedWidth(180);
+    label->setFixedWidth(180);
 
-
-    // Header
     QWidget *header = crearHeader("ClimMeteorLab 2025 - 1.0.0", &window);
 
-    // Mapa
-    //MapWidget *mapWidget = new MapWidget();
-
-    // Layout principal compacto
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(2);
-    mainLayout->setAlignment(Qt::AlignTop); // Fuerza la UI arriba
+    mainLayout->setAlignment(Qt::AlignTop);
 
     mainLayout->addWidget(header, 0, Qt::AlignTop);
     mainLayout->addLayout(gridLayout);
-
-    // mainLayout->addWidget(mapWidget, 1);
-
-    mainLayout->addStretch(0); // evita hueco vacío abajo
+    mainLayout->addWidget(crearGraficoMeteorologico());
+    mainLayout->addStretch(0);
 
     window.setLayout(mainLayout);
     window.show();
 
-    // Conexión del botón
     QObject::connect(btn, &QPushButton::clicked, [&]() {
         QString ciudad = inputCiudad->text();
         int dia = inputDia->text().toInt();
-
         QString tempStr = depure(ciudad, dia);
 
-        // Regex moderno para capturar el último número en el string
         QRegularExpression re("(-?\\d+(\\.\\d+)?)(?!.*\\d)");
         QRegularExpressionMatch match = re.match(tempStr);
 
         double tempC = 0;
-        if (match.hasMatch()) {
-            tempC = match.captured(1).toDouble();
-        } else {
+        if (match.hasMatch()) tempC = match.captured(1).toDouble();
+        else {
             label->setText("Error: no se pudo leer la temperatura");
             return;
         }
 
         double tempK = to_kelvin(tempC);
-
         int Td = 25;
 
         label->setText(
@@ -227,13 +202,8 @@ int main(int argc, char *argv[]) {
                 .arg(pressure_ISA(100, tempC) / 100.0)
                 .arg(relative_humidity(vapor_pressure_from_dewpoint(Td), tempC))
                 .arg(getWindSpeed(59, 60))
-
         );
-
-        //mapWidget->update();
     });
 
     return app.exec();
 }
-
-
